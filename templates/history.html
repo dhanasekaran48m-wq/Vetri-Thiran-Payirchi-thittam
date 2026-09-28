@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Recommendation History</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header>
+    <h2>PocketSmart</h2>
+    <nav><a href="/dashboard">Dashboard</a></nav>
+  </header>
+  <div class="container">
+    <h2>Your Recommendation History</h2>
+    <div id="historyList"></div>
+  </div>
+  <script>
+    async function loadHistory() {
+      const res = await fetch('/recommendation-history');
+      const data = await res.json();
+      const list = document.getElementById('historyList');
+      if (!data.history || !data.history.length) {
+        list.innerHTML = '<p>No history records found.</p>';
+        return;
+      }
+      let html = '';
+      data.history.forEach(item => {
+        html += `
+          <div class="card" style="margin-bottom:1rem;">
+            <h3>${item.recommendation_type.toUpperCase()} Planner (${item.timestamp})</h3>
+            <p>Budget: ₹${item.result_summary.total_budget} | Remaining: ₹${item.result_summary.remaining_budget}</p>
+          </div>
+        `;
+      });
+      list.innerHTML = html;
+    }
+    loadHistory();
+  </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Party Planner - PocketSmart</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header>
+    <h2>PocketSmart</h2>
+    <nav><a href="/dashboard">Dashboard</a></nav>
+  </header>
+  <div class="container">
+    <div class="card">
+      <h2>Party Budget Planner</h2>
+      <form id="partyForm">
+        <div class="form-group">
+          <label>Total Budget (₹)</label>
+          <input type="number" id="total_budget" required>
+        </div>
+        <div class="form-group">
+          <label>Party Type</label>
+          <input type="text" id="party_type" placeholder="e.g. Birthday, Wedding" required>
+        </div>
+        <div class="form-group">
+          <label>Number of Guests</label>
+          <input type="number" id="num_guests" required>
+        </div>
+        <button type="submit" class="btn">Generate Plan</button>
+      </form>
+    </div>
+    <div id="results" class="card" style="margin-top:2rem; display:none;"></div>
+  </div>
+  <script>
+    document.getElementById('partyForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        total_budget: parseFloat(document.getElementById('total_budget').value),
+        party_type: document.getElementById('party_type').value,
+        num_guests: parseInt(document.getElementById('num_guests').value)
+      };
+      
+      const res = await fetch('/party-budget', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      const div = document.getElementById('results');
+      div.style.display = 'block';
+      
+      let html = `<h2>Party Recommendations</h2><p>Remaining: ₹${data.remaining_budget}</p>`;
+      data.budget_breakdown?.forEach(cat => {
+        html += `<h3>${cat.category.toUpperCase()}</h3><table><tr><th>Item</th><th>Cost</th><th>Action</th></tr>`;
+        cat.items?.forEach(i => {
+          let links = '';
+          if (i.shopping_links) {
+            for (let [p, u] of Object.entries(i.shopping_links)) {
+              links += `<a href="${u}" target="_blank" class="link-badge">${p}</a> `;
+            }
+          }
+          html += `<tr><td>${i.name}</td><td>₹${i.estimated_price}</td><td>${links}</td></tr>`;
+        });
+        html += `</table>`;
+      });
+      div.innerHTML = html;
+    });
+  </script>
+</body>
+</html>

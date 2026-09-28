@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Home Interior Planner</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header>
+    <h2>PocketSmart</h2>
+    <nav><a href="/dashboard">Dashboard</a></nav>
+  </header>
+  <div class="container">
+    <div class="card">
+      <h2>Home Interior Budget Planner</h2>
+      <form id="homeForm">
+        <div class="form-group">
+          <label>Total Budget (₹)</label>
+          <input type="number" id="total_budget" required>
+        </div>
+        <div class="form-group">
+          <label>Number of Lights/Fixtures</label>
+          <input type="number" id="num_lights" value="2">
+        </div>
+        <div class="form-group">
+          <label>Number of Ceiling Fans</label>
+          <input type="number" id="num_fans" value="1">
+        </div>
+        <div class="form-group">
+          <label>Number of Furniture Pieces</label>
+          <input type="number" id="num_furniture" value="2">
+        </div>
+        <div class="form-group">
+          <label>Number of Dining Tables</label>
+          <input type="number" id="num_dining_tables" value="1">
+        </div>
+        <button type="submit" class="btn">Generate Plan</button>
+      </form>
+    </div>
+    <div id="results" class="card" style="margin-top:2rem; display:none;"></div>
+  </div>
+  <script>
+    document.getElementById('homeForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        total_budget: parseFloat(document.getElementById('total_budget').value),
+        num_lights: parseInt(document.getElementById('num_lights').value),
+        num_fans: parseInt(document.getElementById('num_fans').value),
+        num_furniture: parseInt(document.getElementById('num_furniture').value),
+        num_dining_tables: parseInt(document.getElementById('num_dining_tables').value)
+      };
+      
+      const res = await fetch('/home-budget', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      
+      const div = document.getElementById('results');
+      div.style.display = 'block';
+      let html = `<h2>Recommended Allocation Plan</h2><p>Remaining Budget: ₹${data.remaining_budget}</p>`;
+      
+      data.budget_breakdown?.forEach(cat => {
+        html += `<h3>${cat.category.toUpperCase()}</h3><table><tr><th>Item</th><th>Price</th><th>Links</th></tr>`;
+        cat.items?.forEach(i => {
+          let links = '';
+          if (i.shopping_links) {
+            for (let [p, u] of Object.entries(i.shopping_links)) {
+              links += `<a href="${u}" target="_blank" class="link-badge">${p}</a> `;
+            }
+          }
+          html += `<tr><td>${i.name}<br><small>${i.description}</small></td><td>₹${i.estimated_price}</td><td>${links}</td></tr>`;
+        });
+        html += `</table>`;
+      });
+      div.innerHTML = html;
+    });
+  </script>
+</body>
+</html>

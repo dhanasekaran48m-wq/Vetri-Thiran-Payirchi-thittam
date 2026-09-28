@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard - PocketSmart AI</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header>
+    <h2>PocketSmart</h2>
+    <nav>
+      <a href="/home-planner">Home Planner</a>
+      <a href="/party-planner">Party Planner</a>
+      <a href="/jewelry-planner">Jewelry Planner</a>
+      <a href="/history">History</a>
+      <form action="/logout" method="POST" style="display:inline;">
+        <button type="submit" style="background:none;border:none;color:white;cursor:pointer;">Logout</button>
+      </form>
+    </nav>
+  </header>
+  <div class="container">
+    <h1>Welcome, {{ user.username }}!</h1>
+    <div class="card-grid">
+      <div class="card">
+        <h3>Home Budget Planner</h3>
+        <p>Plan home fixtures and furniture within your budget limits.</p>
+        <a href="/home-planner" class="btn" style="display:block;text-align:center;text-decoration:none;">Open Planner</a>
+      </div>
+      <div class="card">
+        <h3>Party Budget Planner</h3>
+        <p>Organize events with catered spending plans.</p>
+        <a href="/party-planner" class="btn" style="display:block;text-align:center;text-decoration:none;">Open Planner</a>
+      </div>
+      <div class="card">
+        <h3>Jewelry Budget Planner</h3>
+        <p>Style matching recommendations with image support.</p>
+        <a href="/jewelry-planner" class="btn" style="display:block;text-align:center;text-decoration:none;">Open Planner</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
